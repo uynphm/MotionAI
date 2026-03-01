@@ -1,6 +1,5 @@
 package com.instructor.main;
 
-import javafx.scene.paint.Color;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -20,11 +19,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -97,16 +95,45 @@ public class DanceInstructorUIController {
 	 * file, and sets the scene with the arranged buttons.
 	 */
 	private void handleUserButton() {
-		// Arrange buttons in HBox
-		HBox buttonBox = new HBox(10, startButton, inputButton, backButton);
+		VBox layout = new VBox(40);
+		layout.setAlignment(Pos.CENTER);
+		layout.setStyle("-fx-background-color: #0f172a;");
+		layout.setPadding(new Insets(50));
+
+		VBox card = new VBox(30);
+		card.setAlignment(Pos.CENTER);
+		card.setMaxWidth(800);
+		card.setStyle(
+				"-fx-background-color: rgba(30, 41, 59, 0.5); -fx-background-radius: 24; -fx-padding: 60; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 24;");
+
+		Label title = new Label("Refining Your Input");
+		title.setStyle("-fx-text-fill: white; -fx-font-family: 'Outfit'; -fx-font-size: 32; -fx-font-weight: 800;");
+
+		Label subtitle = new Label("Choose how you want to provide your movement data for analysis.");
+		subtitle.setStyle("-fx-text-fill: #94a3b8; -fx-font-family: 'Outfit'; -fx-font-size: 16;");
+
+		HBox buttonBox = new HBox(25, startButton, inputButton, backButton);
 		buttonBox.setAlignment(Pos.CENTER);
-		buttonBox.setPadding(new Insets(10));
-		buttonBox.setStyle("-fx-background-color: #2B2B2B;");
+
+		// Re-style buttons to be consistent
+		String primaryStyle = "-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit'; -fx-cursor: hand;";
+		String secondaryStyle = "-fx-background-color: #334155; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit'; -fx-cursor: hand;";
+
+		startButton.setStyle(primaryStyle);
+		inputButton.setStyle(primaryStyle);
+		backButton.setStyle(secondaryStyle);
+
+		card.getChildren().addAll(title, subtitle, buttonBox);
+		layout.getChildren().add(card);
 
 		startButton.setOnAction(event -> startVideoCapture(primaryStage, "beginner"));
 		inputButton.setOnAction(e -> openFileChooser(primaryStage, "beginner"));
 
-		primaryStage.setScene(new Scene(buttonBox, 600, 400));
+		Scene scene = new Scene(layout, 1100, 850);
+		if (getClass().getResource("/style.css") != null) {
+			scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+		}
+		primaryStage.setScene(scene);
 	}
 
 	/**
@@ -117,15 +144,45 @@ public class DanceInstructorUIController {
 	 * with the arranged buttons.
 	 */
 	private void handleProfButton() {
-		// Arrange buttons in HBox
-		HBox buttonBox = new HBox(10, startButton, inputButton, backButton);
+		VBox layout = new VBox(40);
+		layout.setAlignment(Pos.CENTER);
+		layout.setStyle("-fx-background-color: #0f172a;");
+		layout.setPadding(new Insets(50));
+
+		VBox card = new VBox(30);
+		card.setAlignment(Pos.CENTER);
+		card.setMaxWidth(800);
+		card.setStyle(
+				"-fx-background-color: rgba(30, 41, 59, 0.5); -fx-background-radius: 24; -fx-padding: 60; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 24;");
+
+		Label title = new Label("Reference Professional Setup");
+		title.setStyle("-fx-text-fill: white; -fx-font-family: 'Outfit'; -fx-font-size: 32; -fx-font-weight: 800;");
+
+		Label subtitle = new Label("Import a professional recording to use as the standard for comparison.");
+		subtitle.setStyle("-fx-text-fill: #94a3b8; -fx-font-family: 'Outfit'; -fx-font-size: 16;");
+
+		HBox buttonBox = new HBox(25, startButton, inputButton, backButton);
 		buttonBox.setAlignment(Pos.CENTER);
-		buttonBox.setPadding(new Insets(10));
-		buttonBox.setStyle("-fx-background-color: #2B2B2B;");
+
+		// Re-style buttons to be consistent
+		String primaryStyle = "-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit'; -fx-cursor: hand;";
+		String secondaryStyle = "-fx-background-color: #334155; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit'; -fx-cursor: hand;";
+
+		startButton.setStyle(primaryStyle);
+		inputButton.setStyle(primaryStyle);
+		backButton.setStyle(secondaryStyle);
+
+		card.getChildren().addAll(title, subtitle, buttonBox);
+		layout.getChildren().add(card);
 
 		startButton.setOnAction(event -> startVideoCapture(primaryStage, "pro"));
 		inputButton.setOnAction(e -> openFileChooser(primaryStage, "pro"));
-		primaryStage.setScene(new Scene(buttonBox, 600, 400));
+
+		Scene scene = new Scene(layout, 1100, 850);
+		if (getClass().getResource("/style.css") != null) {
+			scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+		}
+		primaryStage.setScene(scene);
 	}
 
 	/**
@@ -161,13 +218,15 @@ public class DanceInstructorUIController {
 
 		ApplicationHandler handler = new ApplicationHandler();
 		if (selectedFile != null) {
-			String fileName = selectedFile.getName();
-			if (fileName.endsWith(".mp4")) {
+			String fileName = selectedFile.getName().toLowerCase();
+			if (fileName.endsWith(".mp4") || fileName.endsWith(".avi") || fileName.endsWith(".mov")) {
 				new Thread(() -> {
 					handler.runAWSPoseEstimation(selectedFile.getPath(), videoType);
 				}).start();
 			} else {
-				System.out.println("The selected file is invalid. Please upload a .mp4 file.");
+				System.out.println("The selected file is invalid. Please upload a .mp4 or .avi file.");
+				Platform.runLater(
+						() -> showError("Invalid File", "Please upload a supported video file (.mp4, .avi, .mov)."));
 			}
 		} else {
 			System.out.println("The selected file is invalid. Please upload a .mp4 file.");
@@ -190,95 +249,134 @@ public class DanceInstructorUIController {
 
 		// Run processing in a separate thread
 		new Thread(() -> {
-			// Calculate similarity score
-			float similarityScore = DynamicTimeWarping.totalDtw(userKeypointsMap, proKeypointsMap);
-			float maxSimilarity = 1.5f; // Was 4.0f, but generated artificially high scores
-			int finalScore = poseScoring.calculateScore(similarityScore, maxSimilarity);
+			try {
+				// Calculate initial insufficiency based on total DTW
+				float similarityScore = DynamicTimeWarping.totalDtw(userKeypointsMap, proKeypointsMap);
+				boolean initialCheck = (similarityScore == Float.MAX_VALUE);
 
-			ApplicationHandler handler = new ApplicationHandler();
+				// Generate prompt and check for specific part errors
+				String initialPrompt = initialCheck ? ""
+						: poseScoring.generateComparisonPrompt(userKeypointsMap, proKeypointsMap, userInput);
 
-			// Main layout for feedback
-			VBox feedbackLayout = new VBox(20);
-			feedbackLayout.setPadding(new Insets(20));
-			feedbackLayout.setAlignment(Pos.TOP_LEFT);
-			feedbackLayout.setStyle("-fx-background-color: #2B2B2B;");
+				// Re-evaluate insufficiency based on the specific part being analyzed
+				final boolean isDataInsufficient = initialCheck || (initialPrompt == null
+						|| initialPrompt.trim().isEmpty() || initialPrompt.startsWith("ERROR:"));
+				final String prompt = initialPrompt != null ? initialPrompt : "";
 
-			// Section: Final Score
-			Label scoreHeader = new Label("Final Score:");
-			scoreHeader.setFont(new Font("Georgia", 20));
-			scoreHeader.setStyle("-fx-font-weight: bold;");
-			scoreHeader.setTextFill(Color.WHITE);
+				float maxSimilarity = 1.5f;
+				final int finalScore = isDataInsufficient ? 0
+						: poseScoring.calculateScore(similarityScore, maxSimilarity);
 
-			Label scoreLabel = new Label(finalScore + " / 100");
-			scoreLabel.setFont(new Font("Georgia", 24));
+				ApplicationHandler handler = new ApplicationHandler();
+				final String aiAnalysis = handler.generateFeedbackAPI(prompt);
 
-			// Set color based on score
-			if (finalScore >= 90) {
-				scoreLabel.setStyle(scoreLabel.getStyle() + " -fx-text-fill: green;");
-			} else if (finalScore >= 70) {
-				scoreLabel
-						.setStyle(scoreLabel.getStyle() + " -fx-text-fill: yellow;");
-			} else {
-				scoreLabel.setStyle(scoreLabel.getStyle() + " -fx-text-fill: red;");
+				Platform.runLater(() -> {
+					// Main layout for feedback
+					VBox feedbackLayout = new VBox(30);
+					feedbackLayout.setPadding(new Insets(40));
+					feedbackLayout.setAlignment(Pos.TOP_LEFT);
+					feedbackLayout.setStyle("-fx-background-color: #0f172a;");
+
+					VBox contentCard = new VBox(25);
+					contentCard.setStyle(
+							"-fx-background-color: rgba(30, 41, 59, 0.5); -fx-background-radius: 20; -fx-padding: 30; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 20;");
+
+					// Section: Header
+					Label headerLabel = new Label("Analysis Results");
+					headerLabel.setStyle(
+							"-fx-text-fill: white; -fx-font-family: 'Outfit'; -fx-font-size: 42; -fx-font-weight: 800;");
+
+					// Section: Final Score
+					VBox scoreBox = new VBox(5);
+					Label scoreHeader = new Label("OVERALL ACCURACY");
+					scoreHeader.setStyle(
+							"-fx-text-fill: #94a3b8; -fx-font-family: 'Outfit'; -fx-font-size: 16; -fx-font-weight: bold; -fx-letter-spacing: 1;");
+
+					Label scoreLabel = new Label(isDataInsufficient ? "N/A" : finalScore + "%");
+					String scoreColor = isDataInsufficient ? "#94a3b8"
+							: (finalScore > 80 ? "#10b981" : (finalScore > 50 ? "#3b82f6" : "#ef4444"));
+					scoreLabel.setStyle("-fx-text-fill: " + scoreColor
+							+ "; -fx-font-family: 'Outfit'; -fx-font-size: 64; -fx-font-weight: 900;");
+					scoreBox.getChildren().addAll(scoreHeader, scoreLabel);
+
+					// Section: AI Narrative Breakdown
+					VBox aiFeedbackBox = new VBox(15);
+					aiFeedbackBox.setStyle("-fx-background-color: transparent;");
+
+					Label aiTitle = new Label("AI POSTURE INSIGHTS");
+					aiTitle.setStyle(
+							"-fx-text-fill: #3b82f6; -fx-font-family: 'Outfit'; -fx-font-size: 16; -fx-font-weight: bold; -fx-letter-spacing: 1.5;");
+					aiFeedbackBox.getChildren().add(aiTitle);
+
+					// Parse the wall of text into styled blocks
+					String[] feedbackPoints = aiAnalysis.split("\n");
+					for (String point : feedbackPoints) {
+						if (point.trim().isEmpty())
+							continue;
+
+						HBox pointCard = new HBox(15);
+						pointCard.setAlignment(Pos.TOP_LEFT);
+						pointCard.setStyle(
+								"-fx-background-color: rgba(15, 23, 42, 0.4); -fx-padding: 22; -fx-background-radius: 12; -fx-border-color: rgba(59, 130, 246, 0.1); -fx-border-radius: 12;");
+
+						Label indicator = new Label("◆");
+						indicator.setStyle("-fx-text-fill: #3b82f6; -fx-font-size: 14;");
+
+						Label text = new Label(point.trim().replaceAll("^[-* ]+", ""));
+						text.setWrapText(true);
+						text.setMaxWidth(750);
+						text.setStyle(
+								"-fx-text-fill: #f1f5f9; -fx-font-family: 'Outfit'; -fx-font-size: 18; -fx-line-spacing: 6;");
+
+						pointCard.getChildren().addAll(indicator, text);
+						aiFeedbackBox.getChildren().add(pointCard);
+					}
+
+					// Section: Keypoint Comparison Data
+					VBox dataBox = new VBox(10);
+					Label dataTitle = new Label("COMPARISON DATA (TECH DETAILS)");
+					dataTitle.setStyle(
+							"-fx-text-fill: #94a3b8; -fx-font-family: 'Outfit'; -fx-font-size: 16; -fx-font-weight: bold; -fx-letter-spacing: 1;");
+
+					Label comparisonLabel = new Label(prompt);
+					comparisonLabel.setWrapText(true);
+					comparisonLabel.setMaxWidth(800);
+					comparisonLabel.setStyle(
+							"-fx-text-fill: #cbd5e1; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 14; -fx-background-color: #020617; -fx-padding: 20; -fx-background-radius: 8;");
+					dataBox.getChildren().addAll(dataTitle, comparisonLabel);
+
+					Button returnButton = new Button("New Analysis");
+					returnButton.setStyle(
+							"-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-family: 'Outfit'; -fx-font-weight: bold; -fx-padding: 12 24; -fx-background-radius: 10;");
+					returnButton.setOnAction(e -> {
+						isPartChosen = false;
+						showMainScreen();
+					});
+
+					contentCard.getChildren().addAll(scoreBox, aiFeedbackBox, dataBox, returnButton);
+					feedbackLayout.getChildren().addAll(headerLabel, contentCard);
+
+					ScrollPane scrollPane = new ScrollPane(feedbackLayout);
+					scrollPane.setFitToWidth(true);
+					scrollPane.setVvalue(0.0); // Ensure it starts from the top
+					scrollPane.setStyle(
+							"-fx-background: #0f172a; -fx-background-color: #0f172a; -fx-border-color: transparent;");
+
+					Scene feedbackScene = new Scene(scrollPane, 1100, 850);
+					if (getClass().getResource("/style.css") != null) {
+						feedbackScene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+					}
+					stage.setScene(feedbackScene);
+
+					// Force scroll to top again after layout is done
+					Platform.runLater(() -> scrollPane.setVvalue(0.0));
+
+					stage.centerOnScreen();
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+				Platform.runLater(() -> showError("Analysis Error", "Failed to generate feedback: " + e.getMessage()));
 			}
-
-			// Section: General Feedback
-			Label generalFeedbackHeader = new Label("General Feedback:");
-			generalFeedbackHeader.setFont(new Font("Georgia", 20));
-			generalFeedbackHeader.setStyle("-fx-font-weight: bold;");
-			generalFeedbackHeader.setTextFill(Color.WHITE);
-
-			Label generalFeedbackLabel = new Label(poseFeedback.provideFeedback(finalScore));
-			generalFeedbackLabel.setFont(new Font("Georgia", 16));
-			generalFeedbackLabel.setWrapText(true);
-			generalFeedbackLabel.setTextFill(Color.WHITE);
-
-			// Section: Detailed Feedback
-			Label detailedFeedbackHeader = new Label("Detailed Feedback:");
-			detailedFeedbackHeader.setFont(new Font("Georgia", 20));
-			detailedFeedbackHeader.setStyle("-fx-font-weight: bold;");
-			detailedFeedbackHeader.setTextFill(Color.WHITE);
-
-			TextArea detailedFeedbackTextArea = new TextArea();
-			detailedFeedbackTextArea.setEditable(false);
-			detailedFeedbackTextArea.setWrapText(true);
-			detailedFeedbackTextArea.setFont(new Font("Georgia", 14));
-			detailedFeedbackTextArea.setPrefHeight(600);
-
-			if (finalScore < 90) {
-				String prompt = poseScoring.generateComparisonPrompt(userKeypointsMap, proKeypointsMap, userInput);
-				detailedFeedbackTextArea.setText(handler.generateFeedbackAPI(prompt));
-			} else {
-				detailedFeedbackTextArea.setText("No additional feedback needed. Great job!");
-			}
-
-			// Back button
-			Button backButton = new Button("Back");
-			backButton.setPrefWidth(180);
-			backButton.setStyle(
-					"-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia';-fx-font-size: 20px;");
-			backButton.setOnMouseEntered(e -> backButton.setStyle(
-					"-fx-background-color: #5A5A5A; -fx-text-fill: lightgray; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-			backButton.setOnMouseExited(e -> backButton.setStyle(
-					"-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-
-			backButton.setOnAction(e -> {
-				isPartChosen = false;
-				showMainScreen();
-			});
-
-			// Add sections to the layout
-			feedbackLayout.getChildren().addAll(
-					scoreHeader, scoreLabel,
-					generalFeedbackHeader, generalFeedbackLabel,
-					detailedFeedbackHeader, detailedFeedbackTextArea,
-					backButton);
-
-			Scene feedbackScene = new Scene(feedbackLayout, 800, 700);
-			Platform.runLater(() -> {
-				stage.setScene(feedbackScene);
-				stage.centerOnScreen();
-			});
 		}).start();
 	}
 
@@ -290,26 +388,25 @@ public class DanceInstructorUIController {
 	private void showProgressBar(Stage stage) {
 		// Show loading screen with progress bar
 		ProgressBar progressBar = new ProgressBar();
-		progressBar.setPrefWidth(300);
+		progressBar.setPrefWidth(400);
+		progressBar.setPrefHeight(20);
 
 		progressBar.setStyle(
-				"-fx-accent: #4A90E2;" + // Bar color
-						"-fx-background-color: #3E3E3E;" + // Background color
-						"-fx-background-radius: 10px;" + // Rounded corners for the background
-						"-fx-border-color: #1F1F1F;" + // Border color
-						"-fx-border-width: 2px;" + // Border width
-						"-fx-border-radius: 10px;" // Rounded corners for the border
-		);
+				"-fx-accent: #3b82f6;" + // Vibrant blue
+						"-fx-control-inner-background: #1e293b;" + // Dark background
+						"-fx-background-color: transparent;" + // Transparent wrapper
+						"-fx-background-radius: 10px;" +
+						"-fx-border-radius: 10px;");
 
-		Label loadingLabel = new Label("Loading, please wait...");
-		loadingLabel.setFont(new Font("Georgia", 20));
-		loadingLabel.setTextFill(Color.WHITE);
+		Label loadingLabel = new Label("Analyzing your flow...");
+		loadingLabel.setStyle(
+				"-fx-text-fill: #ffffff; -fx-font-family: 'Outfit'; -fx-font-size: 32px; -fx-font-weight: 800;");
 
-		VBox loadingLayout = new VBox(20, loadingLabel, progressBar);
+		VBox loadingLayout = new VBox(30, loadingLabel, progressBar);
 		loadingLayout.setAlignment(Pos.CENTER);
-		loadingLayout.setStyle("-fx-background-color: #2B2B2B;");
+		loadingLayout.setStyle("-fx-background-color: linear-gradient(to bottom right, #1a1a2e, #16213e);");
 
-		Scene loadingScene = new Scene(loadingLayout, 800, 700);
+		Scene loadingScene = new Scene(loadingLayout, 1100, 850); // Match app size
 		stage.setScene(loadingScene);
 		stage.centerOnScreen();
 	}
@@ -353,47 +450,52 @@ public class DanceInstructorUIController {
 				"nose");
 
 		// Create layout with padding and alignment
-		VBox optionLayout = new VBox(15);
+		VBox optionLayout = new VBox(20);
 		optionLayout.setAlignment(Pos.CENTER);
-		optionLayout.setPadding(new Insets(20)); // Add padding for cleaner spacing
-		optionLayout.setStyle("-fx-background-color: #2B2B2B;");
+		optionLayout.setPadding(new Insets(30));
+		optionLayout.setStyle("-fx-background-color: linear-gradient(to bottom right, #1a1a2e, #16213e);");
 
 		// Style the available options label to improve readability
-		Label availableOptionsLabel = new Label("Available body parts:");
-		availableOptionsLabel.setFont(new Font("Georgia", 20));
-		availableOptionsLabel.setTextFill(Color.WHITE);
+		Label availableOptionsLabel = new Label("Select Body Part for Feedback:");
+		availableOptionsLabel.setStyle(
+				"-fx-text-fill: #ffffff; -fx-font-family: 'Segoe UI', sans-serif; -fx-font-size: 22px; -fx-font-weight: bold;");
 
 		// List body parts in a scrollable area for better user experience
 		ListView<String> bodyPartsListView = new ListView<>();
 		bodyPartsListView.getItems().addAll(validBodyParts);
-		bodyPartsListView.setPrefHeight(150); // Set height to make it scrollable if necessary
+		bodyPartsListView.setPrefHeight(400);
 
 		// Add a custom style to match the layout
 		bodyPartsListView.setStyle(
-				"-fx-background-color: #3E3E3E; " +
+				"-fx-control-inner-background: #1e293b; " +
 						"-fx-text-fill: white; " +
-						"-fx-border-color: #5A5A5A; " +
-						"-fx-font-family: 'Georgia'; " +
-						"-fx-font-size: 16px;");
+						"-fx-background-color: #334155; " +
+						"-fx-background-radius: 8px; " +
+						"-fx-border-color: #475569; " +
+						"-fx-border-radius: 8px; " +
+						"-fx-font-family: 'Segoe UI'; " +
+						"-fx-font-size: 16px; " +
+						"-fx-padding: 5px;");
 
 		// Label for the text input prompt
-		Label label = new Label("Enter body part:");
-		label.setFont(new Font("Georgia", 20));
-		label.setTextFill(Color.WHITE);
+		Label label = new Label("Refine your target:");
+		label.setStyle("-fx-text-fill: #a0aec0; -fx-font-family: 'Segoe UI', sans-serif; -fx-font-size: 16px;");
 
 		// TextField for user input with styling
 		TextField textField = new TextField();
 		textField.setPromptText("e.g. shoulder_left");
-		textField.setPrefHeight(30);
+		textField.setPrefHeight(40);
+		textField.setStyle(
+				"-fx-background-color: #1e293b; -fx-text-fill: white; -fx-prompt-text-fill: #64748b; -fx-font-family: 'Segoe UI'; -fx-font-size: 16px; -fx-background-radius: 8px; -fx-border-color: #475569; -fx-border-radius: 8px;");
 
 		// Submit button with styling
-		Button button = new Button("Submit");
-		button.setStyle(
-				"-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia';-fx-font-size: 20px;");
-		button.setOnMouseEntered(e -> button.setStyle(
-				"-fx-background-color: #5A5A5A; -fx-text-fill: lightgray; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-		button.setOnMouseExited(e -> button.setStyle(
-				"-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
+		Button button = new Button("Analyze Body Part");
+		button.setPrefWidth(250);
+		String btnBase = "-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-family: 'Segoe UI', sans-serif; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 8px; -fx-padding: 12px 24px; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.4), 10, 0, 0, 4);";
+		String btnHover = "-fx-background-color: #059669; -fx-text-fill: white; -fx-font-family: 'Segoe UI', sans-serif; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 8px; -fx-padding: 12px 24px; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(5, 150, 105, 0.6), 12, 0, 0, 6);";
+		button.setStyle(btnBase);
+		button.setOnMouseEntered(e -> button.setStyle(btnHover));
+		button.setOnMouseExited(e -> button.setStyle(btnBase));
 
 		// Select body part on double click
 		bodyPartsListView.setOnMouseClicked(event -> {
@@ -424,7 +526,7 @@ public class DanceInstructorUIController {
 		});
 
 		// Set up and show the scene
-		Scene scene = new Scene(optionLayout, 400, 500);
+		Scene scene = new Scene(optionLayout, 600, 750);
 		stage.setScene(scene);
 		stage.show();
 	}

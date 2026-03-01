@@ -181,7 +181,15 @@ public class ApplicationHandler {
          */
         public String generateFeedbackAPI(String prompt) {
                 if (prompt == null || prompt.trim().isEmpty()) {
-                        return "Great job! Your movement aligns well with the professional benchmark. No major corrections needed.";
+                        return "Insufficient movement data captured for the selected body part in your recording. Please ensure the part is fully visible and the lighting is adequate.";
+                }
+
+                if (prompt.equals("ERROR: NO_DATA_FOR_PART")) {
+                        return "Insufficient movement data captured for the selected body part in your recording. Please ensure the part is fully visible and the lighting is adequate.";
+                }
+
+                if (prompt.equals("ERROR: NO_PRO_DATA_FOR_PART")) {
+                        return "The reference (professional) video does not contain clear data for the selected body part. Please try another segment or source.";
                 }
 
                 // The prompt to send to the python script

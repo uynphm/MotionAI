@@ -28,6 +28,10 @@ class AI_call:
             chat_completion = client.chat.completions.create(
                 messages=[
                     {
+                        "role": "system",
+                        "content": "You are an expert, professional motion analyst analyzing a normal person's motion data compared to a pro. Provide exactly 5 punchy and highly actionable bullet points on how to drastically improve the posture based on posture analysis.",
+                    },
+                    {
                         "role": "user",
                         "content": prompt,
                     }

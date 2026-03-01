@@ -10,11 +10,25 @@ mp_pose = mp.solutions.pose
 mp_hands = mp.solutions.hands
 
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 class PoseEstimationService:
     def __init__(self):
         print("Initializing MediaPipe models...")
-        self.pose = mp_pose.Pose()
-        self.hands = mp_hands.Hands()
+        # static_image_mode=True is more robust for files where tracking might fail
+        # model_complexity=1 is used to avoid downloading heavy models which may fail on some systems
+        self.pose = mp_pose.Pose(
+            static_image_mode=True, 
+            model_complexity=1,
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5
+        )
+        self.hands = mp_hands.Hands(
+            static_image_mode=True,
+            min_detection_confidence=0.5,
+            min_tracking_confidence=0.5
+        )
         
         # Pre-warm the models with a dummy frame to speed up the first actual frame processing
         # This reduces the delay after the camera opens
@@ -84,20 +98,69 @@ class PoseEstimationService:
             "left_thumb_tip": [], "right_thumb_tip": []
         }
 
-    def start_video_capture(self):
-        cap = cv2.VideoCapture(0)
-        frame_width, frame_height = 1280, 720
+    def start_video_capture(self, video_source=0, is_live=True):
+        self.is_live = is_live
+        # Handle cases where video_source might be passed as a string representation of an integer
+        if isinstance(video_source, str) and video_source.isdigit():
+            video_source = int(video_source)
+            self.is_live = True # Digit source is usually camera
+            
+        # If video_source is a file path, verify it exists before attempting to open
+        if isinstance(video_source, str) and not os.path.exists(video_source):
+             print(f"Error: Video file not found: {video_source}")
+             print(f"Current working directory: {os.getcwd()}")
+             print(f"Absolute path checked: {os.path.abspath(video_source)}")
+             return
+
+        cap = cv2.VideoCapture(video_source)
+        if not cap.isOpened():
+             print(f"Error opening video source: {video_source}")
+             if isinstance(video_source, str):
+                 print("Attempting to open with CAP_FFMPEG backend...")
+                 cap = cv2.VideoCapture(video_source, cv2.CAP_FFMPEG)
+                 if not cap.isOpened():
+                     print("Failed to open with CAP_FFMPEG as well.")
+                     return
+             else:
+                 return
+
+        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+        if frame_width == 0 or frame_height == 0:
+            print(f"Error: Could not retrieve frame dimensions for {video_source}. The file might be invalid or unsupported by the current OpenCV backend.")
+            cap.release()
+            return
+
+        print(f"Processing video: {video_source} ({frame_width}x{frame_height}) - is_live={self.is_live}")
+
+        if frame_width == 0 or frame_height == 0:
+            print(f"Error: Could not retrieve frame dimensions for {video_source}. The file might be invalid or unsupported by the current OpenCV backend.")
+            cap.release()
+            return
 
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         out = cv2.VideoWriter(self.video_file, fourcc, 20.0, (frame_width, frame_height))
 
+        detections_count = 0
+        consecutive_no_detections = 0
+        
         while cap.isOpened() and self.is_running:
             ret, frame = cap.read()
             if not ret:
-                print("Failed to capture video")
+                if self.frame_counter == 0:
+                    print(f"Error: Failed to read the first frame from {video_source}. This usually indicates a codec issue or a corrupted file.")
+                else:
+                    print(f"\nVideo stream ended. Total frames: {self.frame_counter}, Frames with detections: {detections_count}")
+                    if detections_count == 0:
+                        print("WARNING: No pose landmarks were detected in the entire video. Check if the person is fully visible.")
                 break
             
+            # Ensure frame has 3 channels
+            if frame.shape[2] == 4:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+                
             frame = cv2.resize(frame, (frame_width, frame_height))
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
@@ -107,10 +170,15 @@ class PoseEstimationService:
             # Hand detection
             hand_results = self.hands.process(image)
 
+            if results.pose_landmarks and self.frame_counter % 30 == 0:
+                 print(f"Frame {self.frame_counter}: Detected pose landmarks but checking visibility...")
+
+            frame_has_landmarks = False
             if results.pose_landmarks:
                 # Draw pose landmarks on the image
                 mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-                self.extract_pose_keypoints(results.pose_landmarks.landmark)
+                if self.extract_pose_keypoints(results.pose_landmarks.landmark):
+                    frame_has_landmarks = True
 
             if hand_results.multi_hand_landmarks:
                 for hand_index, hand_landmarks in enumerate(hand_results.multi_hand_landmarks):
@@ -121,17 +189,32 @@ class PoseEstimationService:
                     # Draw hand landmarks on image
                     mp.solutions.drawing_utils.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-                    # Call extract_hand_keypoints with the correct hand landmarks and hand type
-                    self.extract_hand_keypoints(hand_landmarks, hand_type)
+                    # Call extract_hand_keypoints
+                    if self.extract_hand_keypoints(hand_landmarks, hand_type):
+                        frame_has_landmarks = True
+            
+            if frame_has_landmarks:
+                detections_count += 1
+                consecutive_no_detections = 0
+            else:
+                consecutive_no_detections += 1
 
             # Write the frame to the output video file
             out.write(frame)
 
-            # Display the frame
-            cv2.imshow('Pose Estimation', frame)
-
-            if cv2.waitKey(5) & 0xFF == 27:  # Press 'ESC' to exit
-                break
+            # Display the frame only if live
+            if self.is_live:
+                cv2.imshow('Pose Estimation', frame)
+                # ESC to exit
+                if cv2.waitKey(1) & 0xFF == 27:
+                    break
+            else:
+                if self.frame_counter % 30 == 0:
+                    print(f"Processing frame {self.frame_counter}... (Detections so far: {detections_count})", end="\r", flush=True)
+                
+                # If we've seen many frames without detection in the middle of a file, log it once
+                if consecutive_no_detections == 10 and detections_count > 0:
+                     pass # Don't spam
 
             self.frame_counter += 1  # Increment the frame counter
 
@@ -168,13 +251,15 @@ class PoseEstimationService:
             mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value: "foot_index_right"
         }
         
-
+        any_captured = False
         # Only capture and store keypoints if detected and visible
         for idx, key in keypoint_map.items():
             # Check if the landmark index exists and meets the visibility threshold
-            if idx < len(landmarks) and landmarks[idx].visibility > 0.5:
+            if idx < len(landmarks) and landmarks[idx].visibility > 0.3:
                 landmark = landmarks[idx]
                 self.keypoints_data[key].append([self.frame_counter, landmark.x, landmark.y, landmark.z]) 
+                any_captured = True
+        return any_captured
 
     def extract_hand_keypoints(self, hand_landmarks, hand_type):
         # Define required landmarks with keys for both hands
@@ -183,11 +268,14 @@ class PoseEstimationService:
             f"{hand_type}_thumb_tip": mp.solutions.hands.HandLandmark.THUMB_TIP,
         }
 
+        any_captured = False
         for keypoint, landmark in required_landmarks.items():
             # Check if landmark index exists
             if landmark < len(hand_landmarks.landmark):
                 x, y, z = hand_landmarks.landmark[landmark].x, hand_landmarks.landmark[landmark].y, hand_landmarks.landmark[landmark].z
                 self.keypoints_data[keypoint].append([self.frame_counter, x, y, z])
+                any_captured = True
+        return any_captured
 
     def save_keypoints_data(self):
         # Save the keypoints data to a .txt file
@@ -233,16 +321,33 @@ class PoseEstimationService:
                     break
 
 if __name__ == "__main__":
+    import sys
+    
     # Start the video capture in Python
     pose_service = PoseEstimationService()
 
-    # Start voice recognition in separate thread
-    voice_thread = threading.Thread(target=pose_service.listen_for_stop_command)
-    voice_thread.daemon = True
-    voice_thread.start()
-
-    # Check if camera is available before starting video capture
-    if pose_service.is_camera_available():
-        pose_service.start_video_capture()
+    # If the user provides a video file via command line argument, process it locally
+    if len(sys.argv) > 1:
+        video_path = sys.argv[1]
+        # Check if video_path is a number (camera index) passed as a string
+        if video_path.isdigit():
+            print(f"Starting live camera: {video_path}")
+            # Start voice recognition for live camera
+            voice_thread = threading.Thread(target=pose_service.listen_for_stop_command)
+            voice_thread.daemon = True
+            voice_thread.start()
+            pose_service.start_video_capture(video_path, is_live=True)
+        else:
+            print(f"Processing local file: {video_path}")
+            pose_service.start_video_capture(video_path, is_live=False)
     else:
-        print("Camera not detected. Please connect a camera and try again.")
+        # Start voice recognition in separate thread (Live Camera only)
+        voice_thread = threading.Thread(target=pose_service.listen_for_stop_command)
+        voice_thread.daemon = True
+        voice_thread.start()
+
+        # Check if camera is available before starting video capture
+        if pose_service.is_camera_available():
+            pose_service.start_video_capture()
+        else:
+            print("Camera not detected. Please connect a camera and try again.")

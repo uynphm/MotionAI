@@ -9,120 +9,120 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class DanceInstructorUI extends Application {
 
-    private Scene mainScene;
-    private Button startButton;
-    private Button inputFileButton;
-    private Button doneButton;
-    private Button userButton;
-    private Button profButton;
-    private Button backButton;
+        private Scene mainScene;
+        private Button startButton;
+        private Button inputFileButton;
+        private Button doneButton;
+        private Button userButton;
+        private Button profButton;
+        private Button backButton;
 
-    @Override
-    public void start(Stage primaryStage) {
+        @Override
+        public void start(Stage primaryStage) {
 
-        // Main Screen
-        BorderPane mainLayout = new BorderPane();
-        mainLayout.setPadding(new Insets(20));
-        mainLayout.setStyle("-fx-background-color: #2B2B2B;");
+                // Main Screen
+                BorderPane mainLayout = new BorderPane();
+                mainLayout.getStyleClass().add("root");
+                mainLayout.setStyle("-fx-background-color: #0f172a;"); // Solid dark fallback
 
-        Label title = new Label("Motion AI");
-        title.setFont(new Font("Georgia", 30));
-        title.setTextFill(Color.WHITE);
+                // Load external CSS
+                primaryStage.getScene(); // Just to be safe
 
-        Label description = new Label("Compare your moves to the pros and get detailed feedback.");
-        description.setFont(new Font("Georgia", 20));
-        description.setTextFill(Color.LIGHTGRAY);
+                VBox cardWrapper = new VBox(20);
+                cardWrapper.setAlignment(Pos.CENTER);
+                cardWrapper.setPadding(new Insets(40));
 
-        // Button Controls
-        startButton = new Button("Start Recording");
-        startButton.setPrefWidth(180);
-        startButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia';-fx-font-size: 20px;");
-        startButton.setOnMouseEntered(e -> startButton.setStyle(
-                "-fx-background-color: #5A5A5A; -fx-text-fill: lightgray; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-        startButton.setOnMouseExited(e -> startButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
+                VBox mainCard = new VBox(40);
+                mainCard.getStyleClass().add("card");
+                mainCard.setMaxWidth(850);
+                mainCard.setAlignment(Pos.CENTER);
+                mainCard.setStyle(
+                                "-fx-background-color: rgba(30, 41, 59, 0.5); -fx-background-radius: 24; -fx-padding: 60; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 24;");
 
-        inputFileButton = new Button("Input File");
-        inputFileButton.setPrefWidth(180);
-        inputFileButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia';-fx-font-size: 20px;");
-        inputFileButton.setOnMouseEntered(e -> inputFileButton.setStyle(
-                "-fx-background-color: #5A5A5A; -fx-text-fill: lightgray; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-        inputFileButton.setOnMouseExited(e -> inputFileButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
+                VBox headerBox = new VBox(15);
+                headerBox.setAlignment(Pos.CENTER);
 
-        doneButton = new Button("Start Analysis");
-        doneButton.setPrefWidth(180);
-        doneButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia';-fx-font-size: 20px;");
-        doneButton.setOnMouseEntered(e -> doneButton.setStyle(
-                "-fx-background-color: #5A5A5A; -fx-text-fill: lightgray; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-        doneButton.setOnMouseExited(e -> doneButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
+                Label title = new Label("Motion AI");
+                title.getStyleClass().add("label-title");
+                title.setStyle("-fx-text-fill: white; -fx-font-size: 64; -fx-font-weight: 900; -fx-font-family: 'Outfit';");
 
-        userButton = new Button("User");
-        userButton.setPrefWidth(180);
-        userButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia';-fx-font-size: 20px;");
-        userButton.setOnMouseEntered(e -> userButton.setStyle(
-                "-fx-background-color: #5A5A5A; -fx-text-fill: lightgray; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-        userButton.setOnMouseExited(e -> userButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
+                Label description = new Label("Professional Motion Analysis & AI Alignment Feedback");
+                description.getStyleClass().add("label-description");
+                description.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 18; -fx-font-family: 'Outfit';");
 
-        profButton = new Button("Pro");
-        profButton.setPrefWidth(180);
-        profButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia';-fx-font-size: 20px;");
-        profButton.setOnMouseEntered(e -> profButton.setStyle(
-                "-fx-background-color: #5A5A5A; -fx-text-fill: lightgray; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-        profButton.setOnMouseExited(e -> profButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
+                headerBox.getChildren().addAll(title, description);
 
-        backButton = new Button("Back");
-        backButton.setPrefWidth(180);
-        backButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia';-fx-font-size: 20px;");
-        backButton.setOnMouseEntered(e -> backButton.setStyle(
-                "-fx-background-color: #5A5A5A; -fx-text-fill: lightgray; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
-        backButton.setOnMouseExited(e -> backButton.setStyle(
-                "-fx-background-color: #3E3E3E; -fx-text-fill: white; -fx-font-family: 'Georgia'; -fx-font-size: 20px;"));
+                // Unused button style variables removed. Button styles are applied directly.
 
-        // Event Handlers
-        DanceInstructorUIController controller = new DanceInstructorUIController(primaryStage, startButton,
-                inputFileButton, doneButton, userButton, profButton, backButton);
+                startButton = new Button("Capture Live");
+                startButton.setPrefWidth(220);
+                startButton.getStyleClass().add("button-primary");
+                startButton.setStyle(
+                                "-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit';");
 
-        // VBox for instructions
-        VBox instructionsVbox = new VBox(20);
-        instructionsVbox.setPadding(new Insets(15));
-        instructionsVbox.setAlignment(Pos.CENTER);
+                inputFileButton = new Button("Upload Recording");
+                inputFileButton.setPrefWidth(220);
+                inputFileButton.getStyleClass().add("button-secondary");
+                inputFileButton.setStyle(
+                                "-fx-background-color: #334155; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit';");
 
-        HBox buttonBox = new HBox(10, userButton, profButton);
-        buttonBox.setAlignment(Pos.CENTER);
+                doneButton = new Button("Analyze Results");
+                doneButton.setPrefWidth(300);
+                doneButton.getStyleClass().add("button-success");
+                doneButton.setStyle(
+                                "-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 20; -fx-background-radius: 14; -fx-padding: 18 36; -fx-font-family: 'Outfit';");
 
-        instructionsVbox.getChildren().addAll(title, description, buttonBox, doneButton);
+                userButton = new Button("User Setup");
+                userButton.setPrefWidth(220);
+                userButton.getStyleClass().add("button-primary");
+                userButton.setStyle(
+                                "-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit';");
 
-        // Add elements to main layout
-        mainLayout.setCenter(instructionsVbox);
+                profButton = new Button("Pro Source");
+                profButton.setPrefWidth(220);
+                profButton.getStyleClass().add("button-primary");
+                profButton.setStyle(
+                                "-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit';");
 
-        mainScene = new Scene(mainLayout, 600, 400);
+                backButton = new Button("Back to Menu");
+                backButton.setPrefWidth(200);
+                backButton.getStyleClass().add("button-secondary");
+                backButton.setStyle(
+                                "-fx-background-color: #334155; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12; -fx-padding: 15 30; -fx-font-family: 'Outfit';");
 
-        controller.setMainScene(mainScene);
+                // Event Handlers
+                DanceInstructorUIController controller = new DanceInstructorUIController(primaryStage, startButton,
+                                inputFileButton, doneButton, userButton, profButton, backButton);
 
-        // Set up the stage
-        primaryStage.setTitle("Camera Input App");
-        primaryStage.setScene(mainScene);
-        primaryStage.show();
-    }
+                // Layouts
 
-    public static void main(String[] args) {
-        launch(args);
+                HBox buttonBox = new HBox(25, userButton, profButton);
+                buttonBox.setAlignment(Pos.CENTER);
 
-    }
+                mainCard.getChildren().addAll(headerBox, buttonBox, doneButton);
+                cardWrapper.getChildren().add(mainCard);
+
+                mainLayout.setCenter(cardWrapper);
+
+                mainScene = new Scene(mainLayout, 1100, 850);
+                if (getClass().getResource("/style.css") != null) {
+                        mainScene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+                }
+
+                controller.setMainScene(mainScene);
+
+                // Set up the stage
+                primaryStage.setTitle("Motion AI - Advanced Analysis");
+                primaryStage.setScene(mainScene);
+                primaryStage.show();
+        }
+
+        public static void main(String[] args) {
+                launch(args);
+
+        }
 }

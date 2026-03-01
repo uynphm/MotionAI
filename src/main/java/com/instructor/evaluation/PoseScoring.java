@@ -188,9 +188,13 @@ public class PoseScoring {
 			Map<Integer, float[]> userPartData = userKeypoints.get(bodyPart);
 			Map<Integer, float[]> proPartData = proKeypoints.get(bodyPart);
 
-			// skip this body part if either user or pro part data is null
-			if (proPartData == null || userPartData == null) {
-				continue;
+			// Check if specifically requested part is missing
+			if (userPartData == null || userPartData.isEmpty()) {
+				return "ERROR: NO_DATA_FOR_PART";
+			}
+
+			if (proPartData == null || proPartData.isEmpty()) {
+				return "ERROR: NO_PRO_DATA_FOR_PART";
 			}
 
 			// Calculate alignment path using DTW
