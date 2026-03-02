@@ -1,10 +1,10 @@
 # Motion AI | Premium Flow Analysis
 **Kinematic Intelligence Platform: Enterprise-Grade Movement Telemetry & Real-Time Biometric Feedback**
 
-## 🌟 Modern Web Interface (New)
+## Modern Web Interface (New)
 Motion AI has transitioned to a high-performance, streamlined **Web Dashboard** powered by **React** and **FastAPI**, replacing the legacy JavaFX interface with a premium, glassmorphic design system. This new architecture provides a unified single-page experience for live motion capture, video analysis, and AI-driven posture coaching.
 
-## 🚀 Technical Achievements
+## Technical Achievements
 *   **Web-First Architecture**: Implemented a responsive SPA using **React (Vite)** and **Framer Motion**, delivering a state-of-the-art UX with real-time status telemetry.
 *   **FastAPI Backend Core**: Engineered a high-throughput Python API to bridge edge-vision (MediaPipe/OpenCV) with deep-learning insights.
 *   **AI Posture Coaching**: Integrated **Groq (Llama 3.1)** for sub-second, actionable motion analysis feedback based on professional standards.
@@ -42,6 +42,9 @@ The original high-performance JavaFX interface remains available for desktop-nat
 1. **API Keys**: Create a `.env` file in the project root:
    ```env
    GROQ_API_KEY="your_groq_api_key"
+   AWS_ACCESS_KEY_ID="your_aws_access_key_id"
+   AWS_SECRET_ACCESS_KEY="your_aws_secret_access_key"
+   AWS_REGION="your_aws_region"
    ```
 
 2. **Backend Setup**:

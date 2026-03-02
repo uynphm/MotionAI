@@ -110,7 +110,21 @@ function App() {
     }
   };
 
-  const insights = results?.insights ? results.insights.split('\n').filter(l => l.trim()) : [];
+  const [selectedInsight, setSelectedInsight] = useState(null);
+
+  const insights = results?.insights
+    ? results.insights.split('\n')
+      .filter(l => {
+        const line = l.trim();
+        // Skip empty lines, lines ending with colon (headers), or lines that are just headers
+        if (!line) return false;
+        if (line.endsWith(':')) return false;
+        if (line.toLowerCase().includes('postural strength') && line.length < 25) return false;
+        if (line.toLowerCase().includes('form correction') && line.length < 25) return false;
+        return true;
+      })
+      .map(l => l.replace(/^\s*[-*•\d+.]\s*/, '').replace(/\*\*/g, '').trim())
+    : [];
 
   return (
     <div className="app-container">
@@ -402,45 +416,178 @@ function App() {
                 </div>
               </div>
 
-              <div style={{ marginBottom: '3rem' }}>
-                <h3 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <ShieldCheck size={18} /> AI POSTURE INSIGHTS
-                </h3>
-                {insights.length > 0 ? insights.map((insight, i) => (
-                  <div key={i} className="insight-card" style={{ animation: `slideUp 0.3s ease ${i * 0.1}s both` }}>
-                    <div className="insight-indicator">
-                      <Diamond fill="currentColor" size={10} />
-                    </div>
-                    <div className="insight-text">{insight.replace(/^[-* ]+/, '')}</div>
+              {/* Coaching Board (Grid Layout) */}
+              <div style={{ marginBottom: '3.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '2rem' }}>
+                  <ShieldCheck size={28} color="#3b82f6" />
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.5rem', color: '#f1f5f9', fontWeight: '800' }}>COACHING BOARD</h3>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Skeletal alignment breakdown for your {selectedPart.replace('_', ' ')}</p>
                   </div>
-                )) : (
-                  <div className="insight-card">
-                    <div className="insight-text" style={{ color: '#94a3b8' }}>No significant improvements needed for this area. Great alignment!</div>
-                  </div>
-                )}
-              </div>
+                </div>
 
-              <div>
-                <h3 className="section-title">Technical Deep Dive</h3>
                 <div style={{
-                  background: 'var(--bg-primary)',
-                  padding: '2rem',
-                  borderRadius: '16px',
-                  border: '1px solid rgba(255,255,255,0.05)',
-                  fontFamily: 'JetBrains Mono',
-                  fontSize: '0.875rem',
-                  color: '#64748b',
-                  lineHeight: '1.8',
-                  maxHeight: '200px',
-                  overflowY: 'auto'
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+                  gap: '1.5rem'
                 }}>
-                  <div style={{ color: '#3b82f6', marginBottom: '1rem' }}>// Pose Sequence Trace</div>
-                  <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>
-                    {results.prompt_debug}
-                  </pre>
-                  <div style={{ color: '#10b981', marginTop: '1rem' }}>✓ System verification successful</div>
+                  {insights.length > 0 ? insights.slice(0, 10).map((insight, i) => {
+                    const isCorrection = insight.toLowerCase().includes('should') || insight.toLowerCase().includes('not') || insight.toLowerCase().includes('mismatch') || insight.toLowerCase().includes('error') || insight.toLowerCase().includes('correction') || insight.toLowerCase().includes('incorrect');
+                    return (
+                      <div
+                        key={i}
+                        className="card"
+                        onClick={() => setSelectedInsight({ text: insight, isCorrection })}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '16px',
+                          padding: '24px',
+                          cursor: 'pointer',
+                          border: isCorrection ? '1px solid rgba(239, 68, 68, 0.1)' : '1px solid rgba(16, 185, 129, 0.1)',
+                          background: isCorrection ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.05), transparent)' : 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), transparent)',
+                          animation: `slideUp 0.4s ease ${i * 0.1}s both`,
+                          transition: 'transform 0.2s, box-shadow 0.2s',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-5px)';
+                          e.currentTarget.style.boxShadow = isCorrection ? '0 10px 30px rgba(239, 68, 68, 0.1)' : '0 10px 30px rgba(16, 185, 129, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <div style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '4px 10px',
+                          borderRadius: '20px',
+                          fontSize: '0.65rem',
+                          fontWeight: 'bold',
+                          letterSpacing: '0.5px',
+                          alignSelf: 'flex-start',
+                          background: isCorrection ? '#ef4444' : '#10b981',
+                          color: 'white'
+                        }}>
+                          {isCorrection ? <AlertCircle size={10} /> : <ShieldCheck size={10} />}
+                          {isCorrection ? 'CORRECTION' : 'STRENGTH'}
+                        </div>
+                        <div style={{ fontSize: '1.05rem', color: '#f1f5f9', lineHeight: '1.6', fontWeight: '500' }}>
+                          {insight}
+                        </div>
+                        <div style={{ marginTop: 'auto', fontSize: '0.7rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          Click to expand <ChevronRight size={10} />
+                        </div>
+                      </div>
+                    );
+                  }) : (
+                    <div className="card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: '#64748b' }}>
+                      <Activity size={40} style={{ marginBottom: '1rem', opacity: 0.2 }} />
+                      <p>No anomalies detected. Performance is within acceptable professional margins.</p>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* Insight Modal */}
+              {selectedInsight && (
+                <div style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'rgba(2, 6, 23, 0.95)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 1000,
+                  padding: '2rem',
+                  backdropFilter: 'blur(10px)',
+                  animation: 'fadeIn 0.2s ease'
+                }} onClick={() => setSelectedInsight(null)}>
+                  <div style={{
+                    maxWidth: '600px',
+                    width: '100%',
+                    background: '#0f172a',
+                    borderRadius: '24px',
+                    border: `1px solid ${selectedInsight.isCorrection ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                    padding: '3rem',
+                    position: 'relative',
+                    boxShadow: `0 30px 60px rgba(0,0,0,0.5), 0 0 100px ${selectedInsight.isCorrection ? 'rgba(239, 68, 68, 0.05)' : 'rgba(16, 185, 129, 0.05)'}`,
+                    animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }} onClick={e => e.stopPropagation()}>
+                    <button
+                      onClick={() => setSelectedInsight(null)}
+                      style={{
+                        position: 'absolute',
+                        top: '1.5rem',
+                        right: '1.5rem',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: 'none',
+                        color: '#94a3b8',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <Plus style={{ transform: 'rotate(45deg)' }} />
+                    </button>
+
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 14px',
+                      borderRadius: '20px',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      background: selectedInsight.isCorrection ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                      color: selectedInsight.isCorrection ? '#ef4444' : '#10b981',
+                      marginBottom: '2rem'
+                    }}>
+                      {selectedInsight.isCorrection ? <AlertCircle size={14} /> : <ShieldCheck size={14} />}
+                      {selectedInsight.isCorrection ? 'CORRECTIVE ACTION' : 'STRENGTH IDENTIFIED'}
+                    </div>
+
+                    <h2 style={{ fontSize: '1.75rem', color: '#f8fafc', lineHeight: '1.4', margin: 0, fontWeight: '700' }}>
+                      {selectedInsight.text}
+                    </h2>
+
+                    <div style={{ marginTop: '3rem', padding: '1.5rem', borderRadius: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ fontSize: '0.7rem', fontWeight: 'bold', color: '#475569', letterSpacing: '1px', marginBottom: '1rem' }}>ANALYSIS CONTEXT</div>
+                      <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>
+                        This feedback was generated by comparing your <strong>{selectedPart.replace('_', ' ')}</strong> coordinates against high-precision DTW paths in the pro benchmark. Focus on this specific area during your next recording.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Technical Details (Collapsed at very bottom) */}
+              <details style={{ opacity: 0.4 }}>
+                <summary style={{ fontSize: '0.7rem', color: '#475569', cursor: 'pointer', listStyle: 'none' }}>
+                  Technical Trace
+                </summary>
+                <pre style={{
+                  fontSize: '0.65rem',
+                  padding: '1rem',
+                  whiteSpace: 'pre-wrap',
+                  background: '#000',
+                  borderRadius: '8px',
+                  marginTop: '0.5rem'
+                }}>
+                  {results.prompt_debug}
+                </pre>
+              </details>
             </div>
           )}
         </section>

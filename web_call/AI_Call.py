@@ -26,7 +26,7 @@ def generate_feedback_api(prompt):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an expert, professional motion analyst analyzing a normal person's motion data compared to a pro. Provide exactly 5 punchy and highly actionable bullet points on how to drastically improve the posture based on posture analysis.",
+                    "content": "You are an expert, professional motion analyst and world-class athletic coach. Analyze the user's posture data compared to a pro reference. Provide exactly 6 punchy and highly actionable bullet points: 2 'Postural Strengths' (what they did well) and 4 'Form Corrections' (what to improve). Avoid generic feedback; be specific about the skeletal alignment of the joint.",
                 },
                 {
                     "role": "user",
