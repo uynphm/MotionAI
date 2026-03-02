@@ -1,26 +1,26 @@
 # Motion AI | Premium Flow Analysis
 **Kinematic Intelligence Platform: Enterprise-Grade Movement Telemetry & Real-Time Biometric Feedback**
 
-## Modern Web Interface (New)
-Motion AI has transitioned to a high-performance, streamlined **Web Dashboard** powered by **React** and **FastAPI**, replacing the legacy JavaFX interface with a premium, glassmorphic design system. This new architecture provides a unified single-page experience for live motion capture, video analysis, and AI-driven posture coaching.
+## Project Overview
+Motion AI is a versatile Kinematic Intelligence platform designed for anyone looking to master their physical form—from elite athletes and professional dancers to individuals in physical therapy or those seeking to improve daily ergonomic posture. By leveraging advanced computer vision and cloud-native serverless architecture, the system performs real-time skeletal alignment comparison against professional benchmarks, delivering sub-second AI coaching insights to optimize movement efficiency, accelerate rehabilitation, and prevent long-term injury.
 
-## Technical Achievements
-*   **Web-First Architecture**: Implemented a responsive SPA using **React (Vite)** and **Framer Motion**, delivering a state-of-the-art UX with real-time status telemetry.
-*   **FastAPI Backend Core**: Engineered a high-throughput Python API to bridge edge-vision (MediaPipe/OpenCV) with deep-learning insights.
-*   **AI Posture Coaching**: Integrated **Groq (Llama 3.1)** for sub-second, actionable motion analysis feedback based on professional standards.
-*   **Proprietary Kinematic Engine**: Ported the professional **Dynamic Time Warping (DTW)** engine to Python for seamless server-side sequence alignment and morphological normalization.
+## Technical Highlights
+*   **Enterprise AWS Ecosystem**: Architected with a serverless backbone. Uses **S3** for kinematic session storage, **DynamoDB** for telemetry persistence, and **AWS Lambda** for high-throughput motion processing.
+*   **AI Posture Coaching**: Leverages **Groq (Llama 3.1)** for sub-second, actionable feedback based on professional skeletal alignment benchmarks.
+*   **Modern Web Architecture**: A responsive SPA built with **React (Vite)** and **Framer Motion**, delivering a unified experience for live capture and analysis.
+*   **Kinematic Engine**: Utilizes **Dynamic Time Warping (DTW)** and **MediaPipe** to perform high-precision sequence alignment between user and pro movements.
 
 ---
 
 ## System Architecture
 
 ### 1. Modern Web Stack (Primary)
-The current production environment utilizes a distributed web architecture:
+The production environment utilizes a distributed cloud architecture:
 *   **Frontend**: React 18, Vite, Lucide Icons, Framer Motion (Glassmorphic UI).
-*   **Backend**: FastAPI, Uvicorn, Python 3.10+.
+*   **Backend**: FastAPI (Python 3.10+), Uvicorn.
 *   **Processing**: MediaPipe Pose/Hands, OpenCV, NumPy.
 *   **AI Engine**: Groq Cloud API (Llama-3.1-8b-instant).
-*   **Cloud Ecosystem**: AWS (Lambda, S3, DynamoDB) for serverless orchestration.
+*   **Infrastructure**: AWS SDK (Boto3 & AWS SDK v2 for Java).
 
 ### 2. Legacy Java Engine (Alternative)
 The original high-performance JavaFX interface remains available for desktop-native workflows, utilizing:
@@ -94,3 +94,30 @@ If you require the original desktop interface:
 mvn clean install
 mvn javafx:run
 ```
+
+---
+
+## AWS Cloud Infrastructure & Deployment
+
+### 1. Resource Configuration
+To enable the full serverless stack, ensure the following AWS resources are provisioned:
+*   **Amazon S3**: Create a bucket named `motion-ai-videos` to store processed video frames and skeletal keypoint files.
+*   **Amazon DynamoDB**: Create a table with `SessionID` (String) as the partition key to store kinematic telemetry metrics.
+*   **AWS Lambda**: Deploy a function named `PoseEstimationFunction` using the `python3.10` runtime.
+
+### 2. Lambda Deployment (API Bridge)
+Since the engine relies on **OpenCV** and **MediaPipe**, we recommend deploying via **Docker Container** to handle package sizes:
+```bash
+# Example deployment flow
+docker build -t motion-ai-lambda .
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <acc-id>.dkr.ecr.<region>.amazonaws.com
+docker tag motion-ai-lambda:latest <acc-id>.dkr.ecr.<region>.amazonaws.com/motion-ai:latest
+docker push <acc-id>.dkr.ecr.<region>.amazonaws.com/motion-ai:latest
+# Update Lambda to use the new image
+```
+
+### 3. IAM Permissions
+Ensure your AWS credentials/role has the following permissions:
+- `s3:PutObject`, `s3:GetObject` on `arn:aws:s3:::motion-ai-videos/*`
+- `dynamodb:PutItem`, `dynamodb:GetItem` on your telemetry table.
+- `lambda:InvokeFunction` for the frontend orchestration.

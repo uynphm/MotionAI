@@ -39,8 +39,9 @@ Thumbs.db          # Windows
 *.mkv
 *.avi
 
-# Ignore text files
+# Ignore text files (except requirements.txt)
 *.txt
+!requirements.txt
 
 # Multi-language/Project ignore
 .env*
