@@ -10,40 +10,36 @@ load_dotenv(".env.local")
 # Load API key from environment variable
 api_key = os.getenv("GROQ_API_KEY")
 
-class AI_call:
-    def __init__(self, prompt):
-        if not api_key:
-            print("Error: GROQ_API_KEY not found in environment or .env files.")
-            return
+def generate_feedback_api(prompt):
+    if not api_key:
+        return "Error: GROQ_API_KEY not found in environment or .env files."
 
-        if not prompt or prompt.strip() == "":
-            print("No significant posture differences detected. Great job!")
-            return
+    if not prompt or prompt.strip() == "":
+        return "No significant posture differences detected. Great job!"
 
-        try:
-            # Initialize Groq client
-            client = Groq(api_key=api_key)
-            
-            # Generate completion
-            chat_completion = client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert, professional motion analyst analyzing a normal person's motion data compared to a pro. Provide exactly 5 punchy and highly actionable bullet points on how to drastically improve the posture based on posture analysis.",
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
-                ],
-                model="llama-3.1-8b-instant",
-            )
-            
-            # Print the response
-            print(chat_completion.choices[0].message.content, flush=True)
-            
-        except Exception as e:
-            print(f"Error calling Groq API: {e}")
+    try:
+        # Initialize Groq client
+        client = Groq(api_key=api_key)
+        
+        # Generate completion
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are an expert, professional motion analyst analyzing a normal person's motion data compared to a pro. Provide exactly 5 punchy and highly actionable bullet points on how to drastically improve the posture based on posture analysis.",
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model="llama-3.1-8b-instant",
+        )
+        
+        return chat_completion.choices[0].message.content.strip()
+        
+    except Exception as e:
+        return f"Error calling Groq API: {e}"
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -51,4 +47,4 @@ if __name__ == "__main__":
         sys.exit(1)
         
     prompt = sys.argv[1]
-    AI_call(prompt)
+    print(generate_feedback_api(prompt))
